@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 public class InMemoryPhoneNumberRepository implements PhoneNumberRepository {
     
     private List<PhoneNumber> phoneNumbers = List.of(
-            new PhoneNumber(1, "12345", new Customer(1)),
-            new PhoneNumber(2, "54432", new Customer(1))
+            new PhoneNumber(1, "+61412345678", new Customer(1)),
+            new PhoneNumber(2, "+61881234567", new Customer(1))
         );
 
     @Override
