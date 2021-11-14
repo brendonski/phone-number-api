@@ -2,8 +2,10 @@ package dev.bkelly.phonenumber.controller;
 
 import dev.bkelly.phonenumber.dto.Customer;
 import dev.bkelly.phonenumber.dto.PhoneNumber;
+import dev.bkelly.phonenumber.repository.CustomerRepository;
 import dev.bkelly.phonenumber.repository.PhoneNumberRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,6 +31,9 @@ public class PhoneNumberControllerTest {
     @MockBean
     private PhoneNumberRepository phoneNumberRepository;
 
+    @MockBean
+    private CustomerRepository customerRepository;
+
     @Test
     void getPhoneNumbers() throws Exception {
         
@@ -44,6 +49,37 @@ public class PhoneNumberControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$", hasSize(2)))
             .andExpect(jsonPath("$.[0].number", is("12345")));
+    }
+
+    @Test
+    void getPhoneNumbersByCustomer() throws Exception {
+        
+        var validCustomer = Optional.of(new Customer(1));
+
+        var phoneNumbers = List.of(
+            new PhoneNumber(1, "12345", new Customer(1)),
+            new PhoneNumber(2, "54432", new Customer(1))
+        );
+
+        doReturn(validCustomer).when(customerRepository).findById(1L);
+        doReturn(phoneNumbers).when(phoneNumberRepository).findByCustomer(validCustomer.get());
+
+        mockMvc.perform(get("/customers/1/phone-numbers"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$.[0].number", is("12345")));
+    }
+
+    @Test
+    void getPhoneNumbersByInvalidCustomer() throws Exception {
+        
+        var invalidCustomer = Optional.empty();
+
+        doReturn(invalidCustomer).when(customerRepository).findById(11L);
+
+        mockMvc.perform(get("/customers/11/phone-numbers"))
+            .andExpect(status().isNotFound());
     }
 
 }

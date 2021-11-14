@@ -6,7 +6,6 @@ public class PhoneNumber {
     
     private final long id;
     private final String number;
-    @JsonIgnore
     private final Customer customer;
 
     public PhoneNumber(long id, String number, Customer customer) {
