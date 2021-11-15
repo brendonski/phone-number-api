@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import dev.bkelly.phonenumber.dto.Customer;
@@ -35,13 +36,24 @@ public class PhoneNumberController {
 
     @GetMapping("/customers/{id}/phone-numbers")
     public ResponseEntity<List<PhoneNumber>> phoneNumbersByCustomer(
-        @PathVariable(value = "id") Long id
-    ) {
+            @PathVariable(value = "id") Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (!customer.isPresent()) {
             throw new CustomerNotFoundException("id-" + id);
         }
         return ResponseEntity.ok().body(phoneNumberRepository.findByCustomer(customer.get()));
+    }
+
+    @PutMapping("/phone-numbers/{id}/activate")
+    public ResponseEntity<PhoneNumber> activatePhoneNumber(
+            @PathVariable(value = "id") Long id) {
+        Optional<PhoneNumber> phoneNumber = phoneNumberRepository.findById(id);
+        if (!phoneNumber.isPresent()) {
+            throw new PhoneNumberNotFoundException("id-" + id);
+        }
+        System.out.println("" + phoneNumberRepository.activate(phoneNumber.get()));
+        return ResponseEntity.ok().body(
+            phoneNumberRepository.activate(phoneNumber.get()));
     }
 
 }
